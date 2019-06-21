@@ -1,13 +1,13 @@
-package ru.bestprice.backend.interface;
+package ru.bestprice.backend.apiinterface;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class InterfaceApplication {
+public class ApiInterfaceApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(InterfaceApplication.class, args);
+		SpringApplication.run(ApiInterfaceApplication.class, args);
 	}
 
 }

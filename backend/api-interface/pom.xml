@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.bestprice.backend</groupId>
-	<artifactId>interface</artifactId>
+	<artifactId>api-interface</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>interface</name>
+	<name>api-interface</name>
 	<description>Demo project for Spring Boot</description>
 
 	<properties>

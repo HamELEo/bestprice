@@ -1,4 +1,4 @@
-package ru.bestprice.backend.interface;
+package ru.bestprice.backend.apiinterface;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class InterfaceApplicationTests {
+public class ApiInterfaceApplicationTests {
 
 	@Test
 	public void contextLoads() {

@@ -21,8 +21,7 @@ public class ProxyCustomizer implements RestTemplateCustomizer {
         HttpHost proxy = new HttpHost(proxyUrl, port);
         CloseableHttpClient httpClient = HttpClientBuilder.create().setRoutePlanner(new DefaultProxyRoutePlanner(proxy) {
             @Override
-            protected HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context)
-                    throws HttpException {
+            protected HttpHost determineProxy(HttpHost target, HttpRequest request, HttpContext context) throws HttpException {
                 /*if (target.getHostName().equals("proverkacheka.com")) {
                     return super.determineProxy(target, request, context);
                 }
@@ -31,7 +30,6 @@ public class ProxyCustomizer implements RestTemplateCustomizer {
             }
         }).build();
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory(httpClient));
-
     }
 
 }

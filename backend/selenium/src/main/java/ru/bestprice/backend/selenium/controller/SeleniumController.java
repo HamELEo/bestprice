@@ -11,6 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -48,6 +51,11 @@ public class SeleniumController {
 
     @PostMapping(value = "set_qr_code")
     public ResponseEntity<?> qrCode(@RequestBody Map<String, String> body) {
+        Properties systemProperties = System.getProperties();
+        systemProperties.setProperty( "http.proxyHost", "192.168.254.20" );
+        systemProperties.setProperty( "http.proxyPort", "3142" );
+        systemProperties.setProperty( "https.proxyHost", "192.168.254.20" );
+        systemProperties.setProperty( "https.proxyPort", "3142" );
         QrCode code = parseQrCode(body.get("code"));
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.put("fn", Arrays.asList(code.getFn()));
@@ -63,8 +71,9 @@ public class SeleniumController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Cookie", "ENGID=1.1; _ym_uid=1560243443710875796; _ym_d=1560243443; _ym_isad=2");
-        headers.set("Origin", "https://ping ");
-        headers.set("Accept-Encoding", "gzip, deflate, br' -H 'Accept-Language: ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
+        headers.set("Origin", "https://proverkacheka.com ");
+        headers.set("Accept-Encoding", "gzip, deflate, br");
+        headers.set("Accept-Language", "ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7");
         headers.set("User-Agent", "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/75.0.3770.100 Safari/537.36");
         headers.set("Content-Type", "application/x-www-form-urlencoded");
         headers.set("Accept", "application/json, text/javascript, */*; q=0.01");
@@ -72,9 +81,13 @@ public class SeleniumController {
         headers.set("X-Requested-With", "XMLHttpRequest");
         headers.set("Connection", "keep-alive");
         headers.set("DNT", "1");
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        converter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.TEXT_HTML));
+        restTemplate.getMessageConverters().add(0, converter);
+        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<String> result = restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
-        System.out.println(result);
+        ResponseEntity<Map> result = restTemplate.exchange(uri, HttpMethod.POST, entity, Map.class);
+        System.out.println(result.toString());
         return new ResponseEntity<>(result, HttpStatus.OK);
     }
 

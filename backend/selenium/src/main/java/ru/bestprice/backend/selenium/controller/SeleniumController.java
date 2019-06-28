@@ -47,6 +47,7 @@ public class SeleniumController {
     private String pathToBrowser;
 
     private Proxy proxy;
+
     private ChromeOptions options;
 
     @PostMapping(value = "set_qr_code")
@@ -65,11 +66,8 @@ public class SeleniumController {
         requestBody.put("s", Arrays.asList(code.getS()));
         requestBody.put("t", Arrays.asList(code.getT()));
         requestBody.put("qr",Arrays.asList( "0"));
-        System.out.println(requestBody);
         String uri = "https://proverkacheka.com/check/get".trim();
-        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         headers.set("Cookie", "ENGID=1.1; _ym_uid=1560243443710875796; _ym_d=1560243443; _ym_isad=2");
         headers.set("Origin", "https://proverkacheka.com ");
         headers.set("Accept-Encoding", "gzip, deflate, br");
@@ -81,17 +79,13 @@ public class SeleniumController {
         headers.set("X-Requested-With", "XMLHttpRequest");
         headers.set("Connection", "keep-alive");
         headers.set("DNT", "1");
-        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
-        converter.setSupportedMediaTypes(Arrays.asList(MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON, MediaType.TEXT_HTML));
-        restTemplate.getMessageConverters().add(0, converter);
-        restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(requestBody, headers);
         ResponseEntity<Map> result = restTemplate.exchange(uri, HttpMethod.POST, entity, Map.class);
-        System.out.println(result.toString());
-        return new ResponseEntity<>(result, HttpStatus.OK);
+        return new ResponseEntity<>(result.getBody().get("data"), HttpStatus.OK);
     }
 
-    @PostMapping(value = "set_qr_code1", consumes = MediaType.APPLICATION_JSON_VALUE)
+    //получение данных через Selenium
+   /* @PostMapping(value = "set_qr_code1", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> setQrCode(@RequestBody Map<String, String> body) {
         QrCode code = parseQrCode(body.get("code"));
         System.setProperty("webdriver.chrome.driver", pathToBrowser);
@@ -118,7 +112,7 @@ public class SeleniumController {
         webDriver.findElement(By.xpath(".//button[@class='b-check_btn-send btn btn-primary']")).click();
 
         return new ResponseEntity<>(HttpStatus.OK);
-    }
+    }*/
 
     private QrCode parseQrCode(String qrCode) {
         QrCode code = new QrCode();
@@ -145,7 +139,7 @@ public class SeleniumController {
         return code;
     }
 
-    private synchronized ChromeOptions getChromeOptions() {
+   /* private synchronized ChromeOptions getChromeOptions() {
         if (options == null) {
             options = new ChromeOptions();
             options.setProxy(getProxy());
@@ -164,6 +158,5 @@ public class SeleniumController {
             proxy.setSslProxy(seleniumProxy);
         }
         return proxy;
-    }
-
+    }*/
 }

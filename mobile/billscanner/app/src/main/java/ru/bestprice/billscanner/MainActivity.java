@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
             URL url = null;
             int responseCode = 0;
             try {
-                url = new URL("http://10.0.2.2:50680/qrcode");
+                url = new URL("http://10.0.2.2:51657/qrcode");
                 connection = (HttpURLConnection) url.openConnection();
                 connection.setReadTimeout(3000);
                 connection.setConnectTimeout(3000);

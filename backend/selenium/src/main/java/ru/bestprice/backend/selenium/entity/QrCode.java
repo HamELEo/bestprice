@@ -1,4 +1,4 @@
-package ru.bestprice.backend.selenium.entity.QrCode;
+package ru.bestprice.backend.selenium.entity;
 
 public class QrCode {
 

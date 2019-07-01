@@ -26,4 +26,8 @@ public class SeleniumApplication {
         restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
         return restTemplate;
     }
+   /*@Bean
+   RestTemplate restTemplate() {
+       return new RestTemplate();
+   }*/
 }

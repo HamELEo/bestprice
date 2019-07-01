@@ -22,6 +22,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.client.RestTemplate;
 import ru.bestprice.backend.selenium.entity.QrCode.QrCode;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.*;
 
 @Controller
@@ -53,10 +56,10 @@ public class SeleniumController {
     @PostMapping(value = "set_qr_code")
     public ResponseEntity<?> qrCode(@RequestBody Map<String, String> body) {
         Properties systemProperties = System.getProperties();
-        systemProperties.setProperty( "http.proxyHost", "192.168.254.20" );
-        systemProperties.setProperty( "http.proxyPort", "3142" );
-        systemProperties.setProperty( "https.proxyHost", "192.168.254.20" );
-        systemProperties.setProperty( "https.proxyPort", "3142" );
+        systemProperties.setProperty("http.proxyHost", "192.168.254.20");
+        systemProperties.setProperty("http.proxyPort", "3142");
+        systemProperties.setProperty("https.proxyHost", "192.168.254.20");
+        systemProperties.setProperty("https.proxyPort", "3142");
         QrCode code = parseQrCode(body.get("code"));
         MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
         requestBody.put("fn", Arrays.asList(code.getFn()));
@@ -65,7 +68,7 @@ public class SeleniumController {
         requestBody.put("n", Arrays.asList(code.getN()));
         requestBody.put("s", Arrays.asList(code.getS()));
         requestBody.put("t", Arrays.asList(code.getT()));
-        requestBody.put("qr",Arrays.asList( "0"));
+        requestBody.put("qr", Arrays.asList("0"));
         String uri = "https://proverkacheka.com/check/get".trim();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Cookie", "ENGID=1.1; _ym_uid=1560243443710875796; _ym_d=1560243443; _ym_isad=2");
@@ -113,7 +116,6 @@ public class SeleniumController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }*/
-
     private QrCode parseQrCode(String qrCode) {
         QrCode code = new QrCode();
         Map<String, String> map = new LinkedHashMap<>();

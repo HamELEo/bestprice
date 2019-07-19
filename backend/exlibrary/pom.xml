@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ru.bestprice.backend</groupId>
-	<artifactId>selenium</artifactId>
+	<artifactId>exlibrary</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>selenium</name>
-	<description>Demo project for Spring Boot</description>
+	<name>exlibrary</name>
+	<description>External library for Best Price project</description>
 
 	<properties>
 		<java.version>1.8</java.version>
@@ -21,36 +21,9 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>ru.bestprice.backend</groupId>
-			<artifactId>exlibrary</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-java</artifactId>
-			<version>3.141.59</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-api</artifactId>
-			<version>3.141.59</version>
-		</dependency>
-		<dependency>
-			<groupId>org.seleniumhq.selenium</groupId>
-			<artifactId>selenium-chrome-driver</artifactId>
-			<version>3.141.59</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-config</artifactId>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>2.9.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
@@ -77,6 +50,7 @@
 	</dependencyManagement>
 
 	<build>
+		<finalName>external-library</finalName>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

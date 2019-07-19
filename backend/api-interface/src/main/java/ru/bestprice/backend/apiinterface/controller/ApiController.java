@@ -26,17 +26,17 @@ public class ApiController {
     private EurekaClient eurekaClient;
 
     @Value("${service.selenium.serviceId}")
-    private String esIdService;
+    private String seleniumIdService;
 
-    @Value("${service.selenium.linkSearch}")
-    private String esSearchLink;
+    @Value("${service.selenium.qrLink}")
+    private String seleniumQrCodeLink;
 
     @PostMapping(value = "qrcode", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getQrCode(@RequestBody Map<String, String> body) {
         System.out.println(body);
-        Application application = eurekaClient.getApplication(esIdService);
+        Application application = eurekaClient.getApplication(seleniumIdService);
         InstanceInfo instanceInfo = application.getInstances().get(0);
-        String url= "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort() + "/" + esSearchLink;
+        String url= "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort() + "/" + seleniumQrCodeLink;
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Map<String, String>> requestEntity = new HttpEntity<>(body, headers);

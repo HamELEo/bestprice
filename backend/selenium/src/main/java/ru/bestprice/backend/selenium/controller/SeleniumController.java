@@ -1,6 +1,8 @@
 package ru.bestprice.backend.selenium.controller;
 
+import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
+import com.netflix.discovery.shared.Application;
 import org.openqa.selenium.Proxy;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,10 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
+import ru.bestprice.backend.exlibrary.entity.Receipt;
+import ru.bestprice.backend.exlibrary.entity.ResponseCheck;
 import ru.bestprice.backend.selenium.entity.QrCode;
 
 import java.io.ByteArrayInputStream;
@@ -30,10 +35,10 @@ public class SeleniumController {
     private RestTemplate restTemplate;
 
     @Value("${service.EsService.serviceId}")
-    private String EsService;
+    private String esServiceId;
 
-    @Value("${service.EsService.url}")
-    private String EsServiceUrl;
+    @Value("${service.EsService.qrSaveUrl}")
+    private String esServiceQrSaveUrl;
 
     @Value("${selenium.browser.proxy}")
     private String seleniumProxy;
@@ -66,16 +71,28 @@ public class SeleniumController {
         systemProperties.setProperty("http.proxyPort", "3142");
         systemProperties.setProperty("https.proxyHost", "192.168.254.20");
         systemProperties.setProperty("https.proxyPort", "3142");
-        QrCode code = parseQrCode(body.get("code"));
-        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
-        requestBody.put("fn", Arrays.asList(code.getFn()));
-        requestBody.put("fd", Arrays.asList(code.getFd()));
-        requestBody.put("fp", Arrays.asList(code.getFp()));
-        requestBody.put("n", Arrays.asList(code.getN()));
-        requestBody.put("s", Arrays.asList(code.getS()));
-        requestBody.put("t", Arrays.asList(code.getT()));
-        requestBody.put("qr", Arrays.asList("0"));
         String uri = "https://proverkacheka.com/check/get".trim();
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(requestBody(body.get("code")), getHeaders());
+        ResponseEntity<ResponseCheck> result = restTemplate.exchange(uri, HttpMethod.POST, entity, ResponseCheck.class);
+        return new ResponseEntity<>(sendToEs(result.getBody()), HttpStatus.OK);
+    }
+
+    private ResponseEntity<?> sendToEs(ResponseCheck responseCheck) {
+        Receipt receipt = responseCheck.getData().getReceipt();
+        Application application = eurekaClient.getApplication(esServiceId);
+        InstanceInfo instanceInfo = application.getInstances().get(0);
+        String url= "http://" + instanceInfo.getIPAddr() + ":" + instanceInfo.getPort() + "/" + esServiceQrSaveUrl;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<Receipt> requestEntity = new HttpEntity<>(receipt, headers);
+        try {
+            return restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+        } catch (HttpStatusCodeException e) {
+            return ResponseEntity.status(e.getRawStatusCode()).headers(e.getResponseHeaders()).body(e.getResponseBodyAsString());
+        }
+    }
+
+    private HttpHeaders getHeaders() {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Cookie", "ENGID=1.1; _ym_uid=1560243443710875796; _ym_d=1560243443; _ym_isad=2");
         headers.set("Origin", "https://proverkacheka.com ");
@@ -88,11 +105,21 @@ public class SeleniumController {
         headers.set("X-Requested-With", "XMLHttpRequest");
         headers.set("Connection", "keep-alive");
         headers.set("DNT", "1");
-        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(requestBody, headers);
-        ResponseEntity<Map> result = restTemplate.exchange(uri, HttpMethod.POST, entity, Map.class);
-        return new ResponseEntity<>(result.getBody().get("data"), HttpStatus.OK);
+        return headers;
     }
 
+    private MultiValueMap<String, String> requestBody(String qr) {
+        QrCode code = parseQrCode(qr);
+        MultiValueMap<String, String> requestBody = new LinkedMultiValueMap<>();
+        requestBody.put("fn", Arrays.asList(code.getFn()));
+        requestBody.put("fd", Arrays.asList(code.getFd()));
+        requestBody.put("fp", Arrays.asList(code.getFp()));
+        requestBody.put("n", Arrays.asList(code.getN()));
+        requestBody.put("s", Arrays.asList(code.getS()));
+        requestBody.put("t", Arrays.asList(code.getT()));
+        requestBody.put("qr", Arrays.asList("0"));
+        return requestBody;
+    }
     //получение данных через Selenium
    /* @PostMapping(value = "set_qr_code1", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> setQrCode(@RequestBody Map<String, String> body) {
